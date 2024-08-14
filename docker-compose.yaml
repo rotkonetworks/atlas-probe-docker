@@ -1,0 +1,38 @@
+services:
+  ripe-atlas-probe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ripe-atlas-software-probe:x86_64
+    container_name: ripe-atlas-probe
+    volumes:
+      - type: volume
+        source: ripe_atlas_config
+        target: /probe/etc/ripe-atlas
+      - type: volume
+        source: ripe_atlas_status
+        target: /probe/var/run/ripe-atlas
+      - type: volume
+        source: ripe_atlas_data
+        target: /probe/var/spool/ripe-atlas
+    network_mode: "host"
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+      - SYS_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /probe/etc/ripe-atlas:rw,exec
+      - /probe/var/run/ripe-atlas:rw,exec
+      - /probe/var/spool/ripe-atlas:rw,exec
+    environment:
+      - ATLAS_PREFER_IPV4=1
+    restart: unless-stopped
+
+volumes:
+  ripe_atlas_config:
+  ripe_atlas_status:
+  ripe_atlas_data:
